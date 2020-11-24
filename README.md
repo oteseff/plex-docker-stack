@@ -3,11 +3,11 @@ Plex server running in docker with Sonarr, Radarr and qBittorrent with VPN suppo
 
 Create a .env in the same folder as your docker-compose file with the following:
 
-PUID=1000__
-PGID=1000__
-TZ=America/Los_Angeles__
-USERDIR=/path/to/home__
-MOUNTDIR=/path/to/dir__
-USERNAME=VPN_Username__
-PASSWORD=VPN_Password__
+PUID=1000  
+PGID=1000  
+TZ=America/Los_Angeles  
+USERDIR=/path/to/home  
+MOUNTDIR=/path/to/dir  
+USERNAME=VPN_Username  
+PASSWORD=VPN_Password  
 SERVERIP=IP_of_host
