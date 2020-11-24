@@ -1,0 +1,120 @@
+version: '3.4'
+
+services:
+  watchtower:
+    container_name: watchtower
+    restart: always
+    image: v2tec/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 4 * * *" --cleanup
+
+  alpine-qbittorrent-openvpn:
+    image: guillaumedsde/alpine-qbittorrent-openvpn:latest
+    container_name: "qbittorrentvpn"
+    volumes:
+      - ${MOUNTDIR}/downloads:/downloads
+      - ${USERDIR}/docker/qbittorrentvpn:/config
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - ./.env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - OPENVPN_PROVIDER=
+      - OPENVPN_CONFIG=/config/openvpn/config.ovpn
+      - OPENVPN_USERNAME=${USERNAME}
+      - OPENVPN_PASSWORD=${PASSWORD}
+      - LAN=192.168.0.0/16
+    ports:
+      - 8080:8080
+    cap_add:
+      - NET_ADMIN
+
+  radarr:
+    image: "linuxserver/radarr"
+    container_name: "radarr"
+    volumes:
+      - ${USERDIR}/docker/radarr:/config
+      - ${MOUNTDIR}/downloads:/downloads
+      - ${MOUNTDIR}/movies:/movies
+      - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/shared:/shared
+    ports:
+      - 7878:7878
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+  sonarr:
+    image: "linuxserver/sonarr"
+    container_name: "sonarr"
+    volumes:
+      - ${USERDIR}/docker/sonarr:/config
+      - ${MOUNTDIR}/downloads:/downloads
+      - ${MOUNTDIR}/tv:/tv
+      - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/shared:/shared
+    ports:
+        - 8989:8989
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+  plexms:
+    container_name: plexms
+    restart: always
+    image: plexinc/pms-docker
+    volumes:
+      - ${USERDIR}/docker/plexms:/config
+      - ${USERDIR}/docker/plex_tmp:/transcode
+      - ${MOUNTDIR}:/media
+      - ${USERDIR}/docker/shared:/shared
+    ports:
+      - 32400:32400/tcp
+      - 3005:3005/tcp
+      - 8324:8324/tcp
+      - 32469:32469/tcp
+      - 1900:1900/udp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+    env_file:
+     - ./.env
+    environment:
+      - TZ=${TZ}
+      - HOSTNAME="splex"
+      - PLEX_CLAIM="claim-YYYYYYYYY"
+      - PLEX_UID=${PUID}
+      - PLEX_GID=${PGID}
+      - ADVERTISE_IP=http://${SERVERIP}:32400/
+
+  jackett:
+    image: "linuxserver/jackett"
+    container_name: "jackett"
+    volumes:
+      - ${USERDIR}/docker/jackett:/config
+      - ${MOUNTDIR}/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/shared:/shared
+    ports:
+      - 9117:9117
+    restart: always
+    env_file:
+     - ./.env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+networks:
+  default:
