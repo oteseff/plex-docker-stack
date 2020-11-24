@@ -10,4 +10,4 @@ USERDIR=/path/to/home
 MOUNTDIR=/path/to/dir  
 USERNAME=VPN_Username  
 PASSWORD=VPN_Password  
-SERVERIP=IP_of_host
+SERVERIP=IP_of_docker_host
